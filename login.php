@@ -85,7 +85,7 @@
     const EMAIL_REQUIRED = 'Email invullen';
     const EMAIL_INVALID = 'Geldig email adres invullen';
     const PASSWORD_REQUIRED = 'Password invullen';
-    const CREDENTIALS_NOT_VALID = 'Verkeerde email en/of wachtwoord ingevuld'
+    const CREDENTIALS_NOT_VALID = 'Verkeerde email en/of wachtwoord ingevuld';
 
 // Email sanitize & validate email
 $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
