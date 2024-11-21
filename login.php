@@ -25,6 +25,11 @@
                     <a class="nav-link text-secondary fs-5" href="vendor.php">Bestellen</a>
                 </li>
             </ul>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="login.php">inloggen</a>
+                </li>
+            </ul>
         </div>
     </div>
 </nav>
