@@ -67,7 +67,10 @@
                                         <?= $errors['password'] ?? '' ?>
                                     </div>
                                 </div>
-                                <button type="submit" name="login" value="submit" class="btn btn-primary">Login</button>
+                                <div>
+                                    <button type="submit" name="login" value="submit" class="btn btn-primary d-flex jusitfy-content-start">Login</button>
+                                    <div class="d-flex justify-content-end"><a href="register.php">Registreren</a></div>
+                                </div>
                             </form>
                         </div>
                     </div>
