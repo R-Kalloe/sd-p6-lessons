@@ -1,3 +1,8 @@
+<?php
+include_once 'modules/database.php';
+include_once 'modules/functions.php';
+session_start();
+?>
 <html>
 <head>
     <meta charset="UTF-8">
@@ -55,14 +60,14 @@
                         <form class="row">
                             <div class="mb-3 col-md-6">
                                 <label for="ExampleFirstName" class="form-label">Voornaam</label>
-                                <input type="text" class="form-control" name="firstname" id="firstname" value="<?php echo $inputs['first_name'] ?? '' ?>">
+                                <input type="text" class="form-control" name="firstname" id="firstname" value="<?php echo $inputs['firstname'] ?? '' ?>">
                                 <div class="form-text text-danger">
                                     <?= $errors['firstname'] ?? '' ?>
                                 </div>
                             </div>
                             <div class="mb-3 col-md-6">
                                 <label for="exampleLastName" class="form-label">Achternaam</label>
-                                <input type="text" class="form-control" name="lastname" id="lastname" value="<?php echo $inputs['last_name'] ?? '' ?>">
+                                <input type="text" class="form-control" name="lastname" id="lastname" value="<?php echo $inputs['lastname'] ?? '' ?>">
                                 <div class="form-text text-danger">
                                     <?= $errors['lastname'] ?? '' ?>
                                 </div>
@@ -97,47 +102,68 @@
 </html>
 
 <?php
-session_start();
-include_once 'modules/database.php';
-include_once 'modules/functions.php';
+const FIRSTNAME_REQUIRED = 'Voornaam invullen';
+const LASTNAME_REQUIRED = 'Achternaam invullen';
+const EMAIL_REQUIRED = 'Email invullen';
+const PASSWORD_REQUIRED = 'Password invullen';
 
 $errors = [];
 $inputs = [];
 
-const EMAIL_REQUIRED = 'Email invullen';
-const EMAIL_INVALID = 'Geldig email adres invullen';
-const PASSWORD_REQUIRED = 'Password invullen';
-const CREDENTIALS_NOT_VALID = 'Verkeerde email en/of wachtwoord ingevuld';
+if(isset($_POST['send'])) {
+    //Sanitize and validate firstname
+    $firstname = filter_input(INPUT_POST, 'firstname', FILTER_SANITIZE_SPECIAL_CHARS);
 
-// Email sanitize & validate email
-$email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
+    $firstname = trim($firstname);
+    if(empty($firstname)) {
+        $errors['firstname'] = FIRSTNAME_REQUIRED;
+    } else {
+        $inputs['firstname'] = $firstname;
+    }
+}
 
-if ($email===false) {
+if(isset($_POST['send'])) {
+    //Sanitize and validate lastname
+    $lastname = filter_input(INPUT_POST, 'lastname', FILTER_SANITIZE_SPECIAL_CHARS);
+
+    $lastname = trim($lastname);
+    if(empty($lastname)) {
+        $errors['lastname'] = LASTNAME_REQUIRED;
+    } else {
+        $inputs['lastname'] = $lastname;
+    }
+}
+
+$email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+
+if($email===false) {
     //Validate email
     $errors['email'] = EMAIL_REQUIRED;
 } else {
-    $inputs['email'] = EMAIL_INVALID;
+    $inputs['email'] = $email;
 }
 
 //Validate password
 $password = filter_input(INPUT_POST, 'password');
 
+$password=trim($password);
 if(empty($password)) {
     $errors['password'] = PASSWORD_REQUIRED;
-}   else {
+} else {
     $inputs['password'] = $password;
 }
 
-if (count($errors) === 0) {
-    //Var dump ($result)
-    switch($result) {
-        case 'ADMIN':
-            header("location: admin.php");
-            break;
-        case 'FAILURE':
-            $errors['credentials'] = CREDENTIALS_NOT_VALID;
-            include_once "login.php";
-            break;
-    }
+if(count($errors) === 0) {
+    global $pdo;
+
+    $sth = $pdo->prepare('INSERT INTO user (first_name, last_name, email, password, role) VALUES (:firstname, :lastname, :email, :password, "member") )');
+
+    $sth->bindParam(':firstname', $inputs['firstname']);
+    $sth->bindParam(':lastname', $inputs['lastname']);
+    $sth->bindParam(':email', $inputs['email']);
+    $sth->bindParam(':password', $inputs['password']);
+    $result = $sth->execute();
+    //Later flash message toevoegen
+    header("Location: index.php");
 }
 ?>
